@@ -1,0 +1,41 @@
+import requests
+from bs4 import BeautifulSoup
+
+def get_crypto_prices():
+    # URL of the CoinMarketCap page for cryptocurrencies
+    url = 'https://coinmarketcap.com/'
+
+    # Send a GET request to the URL
+    response = requests.get(url)
+
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Parse the HTML content of the page using BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Find all elements with class 'priceValue'
+        price_elements = soup.find_all(class_='priceValue')
+
+        # Extract cryptocurrency names and prices
+        crypto_prices = {}
+        for element in price_elements:
+            crypto_name = element.parent.find(class_='sc-1eb5slv-0').text.strip()
+            price = element.text.strip()
+            crypto_prices[crypto_name] = price
+
+        return crypto_prices
+    else:
+        # If the request was not successful, print an error message
+        print('Failed to retrieve data from CoinMarketCap')
+        return None
+
+# Main function to display cryptocurrency prices
+def main():
+    crypto_prices = get_crypto_prices()
+    if crypto_prices:
+        print("Cryptocurrency Prices:")
+        for name, price in crypto_prices.items():
+            print(f"{name}: {price}")
+
+if __name__ == "__main__":
+    main()
